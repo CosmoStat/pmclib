@@ -1,0 +1,59 @@
+srcdir = "src/"
+
+def build(bld):
+
+  if bld.env.dolua:
+    luaextrac = " src/pmc_rc.c"
+    luaextrah = " include/pmc_rc.h"
+    luaextral = " readConf"
+  else:
+    luaextrac = ""
+    luaextrah = ""
+    luaextral = ""
+    luaextradef = []
+  if bld.env.hdf5:
+    hdf5extral = " hdf5"
+  else:
+    hdf5extral = ""
+  
+  lapackextral = ""
+  if bld.env.lapack:
+    lapackextral = " lapack "
+  fftw3extral = ""
+  if bld.env.fftw3:
+    fftw3extral = " fftw3 "
+
+  bld.new_task_gen(
+    features = 'cc cshlib',
+    source = 'src/pmc.c src/mcmc.c src/distribution.c src/parabox.c src/tools.c src/optimize.c'+luaextrac,
+    target = 'pmc',
+    includes = 'include/ ../pmctools/include ',
+    defines = ["_PMC_REL_"],
+    uselib_local = 'errorio mvdens '+luaextral,
+    uselib = 'gsl gslcblas dl '+hdf5extral+fftw3extral+lapackextral)
+  
+  bld.install_files('${PREFIX}/include/pmclib', 
+                    'include/allmc.h include/pmc.h include/distribution.h include/mcmc.h include/parabox.h include/tools.h'+luaextrah)
+  
+  if bld.env.dompi:
+    
+    bld.new_task_gen(
+      features = 'cc cshlib',
+      source = 'src/pmc_mpi.c',
+      target = 'pmc_mpi',
+      includes = 'include/ ../pmctools/include',
+      uselib_local = 'errorio mvdens pmc'+luaextral,
+      uselib = 'gsl gslcblas dl'+fftw3extral+lapackextral,    
+      env = bld.env_of_name('mpi'))
+    bld.install_files('${PREFIX}/include/pmclib', 
+                      'include/pmc_mpi.h')
+    bld.new_task_gen(
+      features = 'cc cshlib',
+      source = 'src/gridMe.c',
+      target = 'gridMe',
+      includes = 'include/ ../pmctools/include',
+      uselib_local = 'errorio mvdens pmc'+luaextral,
+      uselib = 'gsl gslcblas dl'+hdf5extral+fftw3extral+lapackextral, 
+      env = bld.env_of_name('mpi'))
+    bld.install_files('${PREFIX}/include/pmclib', 
+                      'include/gridMe.h')

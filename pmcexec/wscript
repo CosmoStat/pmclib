@@ -1,0 +1,88 @@
+def build(bld):
+
+  if not bld.env.dolua:
+    return
+  
+  # --------compute_lkl-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'compute_lkl.c',
+    target = 'compute_lkl',
+    includes = '../pmctools/include ../pmclib/include',
+    uselib_local = 'errorio readConf pmc',
+    uselib = 'lua dl'
+    )
+
+  # --------grid-------------
+  if bld.env.dompi:
+    bld.new_task_gen(
+      features = 'cc cprogram',
+      source = 'vanilla_grid.c',
+      target = 'simple_grid',
+      includes = '../pmctools/include ../pmclib/include target/',
+      uselib_local = 'errorio readConf gridMe pmc',
+      uselib = 'gsl gslcblas lua dl',    
+      env = bld.env_of_name('mpibld')
+      )
+                      
+  # --------importance-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'vanilla_importance.c',
+    target = 'simple_importance',
+    includes = '../pmctools/include ../pmclib/include target/',
+    uselib_local = 'errorio readConf pmc ',
+    uselib = 'gsl gslcblas lua dl'
+    )
+
+  if bld.env.dompi:
+    bld.new_task_gen(
+      features = 'cc cprogram',
+      source = 'vanilla_importance_mpi.c',
+      target = 'simple_importance_mpi',
+      includes = '../pmctools/include ../pmclib/include target/',
+      uselib_local = 'errorio readConf pmc pmc_mpi',
+      uselib = 'gsl gslcblas lua dl',    
+      env = bld.env_of_name('mpibld')
+      )
+
+  # --------pmc-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'vanilla_pmc.c',
+    target = 'simple_pmc',
+    includes = '../pmctools/include ../pmclib/include target/',
+    uselib_local = 'errorio readConf pmc ',
+    uselib = 'gsl gslcblas lua dl'    
+    )
+    
+  if bld.env.dompi:
+    bld.new_task_gen(
+      features = 'cc cprogram',
+      source = 'vanilla_pmc_mpi.c',
+      target = 'simple_pmc_mpi',
+      includes = '../pmctools/include ../pmclib/include target/',
+      uselib_local = 'errorio readConf pmc pmc_mpi',
+      uselib = 'gsl gslcblas lua dl',    
+      env = bld.env_of_name('mpibld')
+      )
+
+  # --------mcmc-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'vanilla_amcmc.c',
+    target = 'simple_amcmc',
+    includes = '../pmctools/include ../pmclib/include target/',
+    uselib_local = 'errorio readConf pmc',
+    uselib = 'gsl gslcblas lua dl',    
+    )
+
+  # --------mcmc-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'vanilla_getpeak.c',
+    target = 'simple_getpeak',
+    includes = '../pmctools/include ../pmclib/include target/',
+    uselib_local = 'errorio readConf pmc',
+    uselib = 'gsl gslcblas lua dl',    
+    )

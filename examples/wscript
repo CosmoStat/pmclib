@@ -1,0 +1,80 @@
+
+
+def build(bld):
+  def injectpath(task):
+    src = task.inputs[0].srcpath(task.env)
+    print src 
+    tgt = task.outputs[0].bldpath(task.env) 
+    f=open(src)
+    txt = f.read()
+    txt = txt%{"path":bld.env.install_examples+"/libsampleTarget."+bld.env.shsuffix}
+    f=open(tgt,"w")
+    print >>f,txt,
+    f.close()
+
+  if not bld.env.dolua:
+    return
+  
+  # --------readConf-------------
+  bld.new_task_gen(
+    features = 'cc cprogram',
+    source = 'readConf/test_readConf.c',
+    target = 'test_readConf',
+    includes = '../pmctools/include',
+    uselib_local = 'errorio readConf',
+    uselib = 'lua',
+    install_path = bld.env.install_examples)
+  bld.install_files(bld.env.install_examples, 
+                    'readConf/test_readConf.lua')
+                      
+  # --------sampleTarget-------------
+  bld.new_task_gen(
+    features = 'cc cshlib',
+    source = 'target/sampleTarget.c',
+    target = 'sampleTarget',
+    includes = '../pmctools/include ../pmclib/include',
+    uselib_local = 'errorio pmc readConf',
+    install_path = bld.env.install_examples)
+
+  bld(rule = injectpath, 
+      source = 'target/test_sampleTarget.lua', 
+      target="test_sampleTarget.lua", 
+      install_path = bld.env.install_examples)
+
+  # --------grid-------------
+  bld(rule = injectpath, 
+      source = 'grid/test_grid.lua', 
+      target='test_grid.lua', 
+      install_path = bld.env.install_examples)
+                      
+  # --------importance-------------
+  bld(rule = injectpath, 
+      source = 'importance/test_importance.lua', 
+      target='test_importance.lua', 
+      install_path = bld.env.install_examples)
+  bld(rule = injectpath, 
+      source = 'importance/test_importance_mpi.lua', 
+      target='test_importance_mpi.lua', 
+      install_path = bld.env.install_examples)
+
+  # --------pmc-------------
+  bld(rule = injectpath, 
+      source = 'pmc/test_pmc.lua', 
+      target='test_pmc.lua', 
+      install_path = bld.env.install_examples)
+  bld(rule = injectpath, 
+      source = 'pmc/test_pmc_mpi.lua', 
+      target='test_pmc_mpi.lua', 
+      install_path = bld.env.install_examples)
+
+  # --------mcmc-------------
+  bld(rule = injectpath, 
+      source = 'mcmc/test_mcmc.lua', 
+      target='test_mcmc.lua', 
+      install_path = bld.env.install_examples)
+
+  # --------optimize----------
+  bld(rule = injectpath, 
+      source = 'peak/test_getpeak.lua', 
+      target='test_getpeak.lua', 
+      install_path = bld.env.install_examples)

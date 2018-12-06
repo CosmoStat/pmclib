@@ -1,0 +1,44 @@
+srcdir = "src/"
+
+def build(bld):
+
+  if bld.env.hdf5:
+    hdf5extral = " hdf5"
+  else:
+    hdf5extral = ""
+    
+  bld.new_task_gen(
+    features = 'cc cshlib',
+    source = 'src/errorlist.c src/io.c',
+    target = 'errorio',
+    includes = 'include/')
+  bld.install_files('${PREFIX}/include/pmctools', 'include/errorlist.h include/io.h include/errorio.h')
+  
+  defs = []
+  usefftw = " fftw3"
+  if not bld.env.fftw3:
+    defs = ["_NOFFTW_"]
+    usefftw = ""
+  lapackextral = ""
+  if bld.env.lapack:
+    lapackextral = " lapack "
+  bld.new_task_gen(
+    features = 'cc cshlib',
+    source = 'src/mvdens.c  src/maths.c',
+    target = 'mvdens',
+    uselib_local = 'errorio',
+    uselib = 'gsl gslcblas'+hdf5extral+usefftw+lapackextral,
+    includes = 'include/',
+    defines = defs)
+  bld.install_files('${PREFIX}/include/pmctools', 'include/mvdens.h include/maths.h include/maths_base.h')
+
+  if bld.env.dolua:
+    bld.new_task_gen(
+      features = 'cc cshlib',
+      source = 'src/readConf.c',
+      target = 'readConf',
+      uselib_local = 'errorio',
+      uselib = 'lua',
+      includes = 'include/')
+    bld.install_files('${PREFIX}/include/pmctools', 'include/readConf.h')
+    
