@@ -10,7 +10,9 @@ Karim Benabed
 
 Olivier Cappé, Jean-François Cardoso, Gersende Fort, Martin Kilbinger, Simon Prunet, Christian P. Robert, Darren Wraith
 
-Version: 1.1
+### Version
+
+1.1
 
 ### Installation
 
