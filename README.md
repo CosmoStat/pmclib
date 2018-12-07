@@ -25,7 +25,8 @@ A directory `pmclib` is created automatically. Change into that directory, and i
 First, configure the software:
 
 ```bash
-./waf configure
+cd pmclib
+./waf configure [--destdir=PATH]
 ```
 
 You might need to set paths to required libraries and other options. `waf` can install libraries for you. Note that some libraries are not essential for the use of `pmclib` (but optional e.g. `lapack`, `lua`).
@@ -36,11 +37,13 @@ Next, compile the code:
 ./waf build
 ```
 
-On success, install the library:
+On success, install the library, with optional installation path PATH.
 
 ```bash
-./waf install
+./waf install --destdir=PATH
 ```
+
+This will copy include files to `PATH/include/pmclib` and `PATH/include/pmctools`, and the two libraries `libpmc.*` and `libpmc_mpi.*` to `PATH/lib`.
 
 ## References
 
