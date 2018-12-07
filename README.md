@@ -40,7 +40,7 @@ On success, install the library:
 ./waf install
 ```
 
-### References
+## References
 
 `pmclib` has been used for cosmological inference in [Wraith, Kilbinger, Benabed et al. (2009)](https://arxiv.org/abs/0903.0837).
 Please cite at least this paper when using `pmclib`. Cosmological model comparison using the Bayesian evidence estimated with PMC is discussed in [Kilbinger, Wraith, Robert et al. (2010)](https://arxiv.org/abs/0912.1614). 
