@@ -22,11 +22,11 @@ Download the library from the github repository:
 git clone https://github.com/martinkilbinger/pmclib
 ```
 A directory `pmclib` is created automatically. Change into that directory, and install the code using the `python `script `waf`.
-First, configure the software:
+First, configure the software, with optional installation path PATH.
 
 ```bash
 cd pmclib
-./waf configure
+./waf configure --prefix=PATH
 ```
 
 You might need to set paths to required libraries and other options. `waf` can install libraries for you. Note that some libraries are not essential for the use of `pmclib` (but optional e.g. `lapack`, `lua`).
@@ -37,13 +37,14 @@ Next, compile the code:
 ./waf build
 ```
 
-On success, install the library, with optional installation path PATH.
+On success, install the library.
 
 ```bash
-./waf install --destdir=PATH
+[sudo] ./waf install
 ```
 
-This will copy include files to `PATH/include/pmclib` and `PATH/include/pmctools`, and the two libraries `libpmc.*` and `libpmc_mpi.*` to `PATH/lib`.
+This will copy include files to `PATH/include/pmclib` and `PATH/include/pmctools`, and the PMC libraries to `PATH/lib`. You might need to prepend `sudo` to `waf` if you want to install
+the software to a system-wide location. Otherwise, specify a local path in the configuration step above.
 
 ## References
 
