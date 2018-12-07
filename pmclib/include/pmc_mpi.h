@@ -12,17 +12,11 @@
 
 #include <mpi.h>
 
-#ifdef __PLANCK__
-#include "HL2_likely/pmclib/pmc.h"
-#include "HL2_likely/tools/mvdens.h"
-#include "HL2_likely/tools/errorlist.h"
-#else
 #include "pmc.h"
-#include "mvdens.h"
-#include "errorlist.h"
-#endif
+#include "pmctools/mvdens.h"
+#include "pmctools/errorlist.h"
 
-/* Set DEBUG_MPI to 1 for debug outputs concerning communication between master and slaves */
+/* Set DEBUG_MPI to 1 for debug outputs concerning communication between master and clients */
 #define DEBUG_MPI 0
 #define fprintfDEBUG(file,str,...) if (DEBUG_MPI) fprintf(file, str, __VA_ARGS__)
 
@@ -58,7 +52,6 @@
 pmc_simu* pmc_simu_init_mpi(long nsamples, int ndim, int nded,error **err);
 
 size_t pmc_simu_importance_mpi(pmc_simu *psim, gsl_rng *r,error **err);
-double pmc_simu_pmc_step_mpi(pmc_simu *psim, gsl_rng *r,error **err);
 void* mvdens_broadcast_mpi(void*,error **err);
 void pmc_simu_realloc_mpi(pmc_simu *psim,long newsamples,error **err);
 
@@ -94,11 +87,11 @@ void receive_simulation(pmc_simu *psim, int basetag,int myid, error **err);
 void send_mix_mvdens(mix_mvdens *m, int nproc,error **err);
 mix_mvdens *receive_mix_mvdens(int myid, int nproc,error **err);
 
-void send_importance_weight(int myid, int basetag, pmc_simu *psim,size_t nok,error **err);
+void send_importance_weight(int myid, int basetag, pmc_simu *psim,size_t nok);
 size_t receive_importance_weight(pmc_simu *psim,int nproc,int master_cnt,int 
                                  master_sample,error **err);
 
-#ifdef _WITH_RC_               
+#ifdef HAS_LUA
 
 #include "readConf.h"                  
 #include "pmc_rc.h"                  

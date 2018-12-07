@@ -12,18 +12,12 @@
 #define __MC_DIST
 #include <gsl/gsl_randist.h>
 
-#ifdef __PLANCK__
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/tools/mvdens.h"
-#include "HL2_likely/pmclib/parabox.h"
-#include "HL2_likely/pmclib/allmc.h"
-#else
-#include "errorlist.h"
+#include "pmctools/errorlist.h"
+#include "pmctools/mvdens.h"
+#include "pmctools/maths.h"
+
 #include "parabox.h"
 #include "allmc.h"
-#include "mvdens.h"
-#include "maths.h"
-#endif
 #include <dlfcn.h>
 
  typedef char _char_name[1024];

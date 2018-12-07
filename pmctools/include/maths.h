@@ -6,6 +6,12 @@
 #ifndef __MATHS_H
 #define __MATHS_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #ifndef _NOFFTW_
 #include <fftw3.h>
 #endif
@@ -20,6 +26,12 @@
 #include "io.h"
 #endif
 
+
+#ifdef __cplusplus
+namespace nicaea {
+#endif
+
+
 #define NR_END 1
 #define FREE_ARG char*
 
@@ -28,7 +40,7 @@ typedef enum {comp_c=0, comp_b=1, comp_nu=2} comp_t;
 #define NCOMP 3
 
 /* The following scales are Used for Hankel transforms */
-#define theta_min 3.0e-7
+#define theta_min 3.0e-7 
 #define theta_max 0.12
 
 #define l_min     0.0001
@@ -36,7 +48,7 @@ typedef enum {comp_c=0, comp_b=1, comp_nu=2} comp_t;
 
 /* Size of fast Hankel transform arrays (from lensing.h) */
 #define N_thetaH  1024
-typedef enum {tp_xipm, tp_gsqr, tp_map2_poly, tp_map2_gauss, tp_w, tp_xir} tpstat_t;
+typedef enum {tp_xipm, tp_gsqr, tp_map2_poly, tp_map2_gauss, tp_w, tp_xir, tp_gt} tpstat_t;
 
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
@@ -229,5 +241,10 @@ void hankel_kernel_mumu(double x, fftw_complex *res, double q, double mu, error 
 void hankel_kernel_exp(double k, fftw_complex *res, error **err);
 void hankel_kernel_tophat(double k, fftw_complex *res, error **err);
 #endif
+
+#ifdef __cplusplus
+}}
+#endif
+
 
 #endif

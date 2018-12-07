@@ -11,17 +11,10 @@
 #ifndef __TOOLS_H
 #define __TOOLS_H
 
-#ifdef __PLANCK__
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/tools/io.h"
-#include "HL2_likely/tools/maths_base.h"
-#include "HL2_likely/pmclib/mcmc.h"
-#else
-#include "errorlist.h"
-#include "io.h"
+#include "pmctools/errorlist.h"
+#include "pmctools/io.h"
+#include "pmctools/maths_base.h"
 #include "mcmc.h"
-#include "maths_base.h"
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>

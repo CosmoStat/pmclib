@@ -12,13 +12,8 @@
 
 #include <gsl/gsl_randist.h>
 
-#ifdef __PLANCK__
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/pmclib/parabox.h"
-#else
-#include "errorlist.h"
+#include "pmctools/errorlist.h"
 #include "parabox.h"
-#endif
 
 struct _pmc_simu_struct_;
 struct _distribution_struct_;

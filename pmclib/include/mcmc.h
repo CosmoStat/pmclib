@@ -9,21 +9,13 @@
 
 #ifndef __MCMC_H
 #define __MCMC_H
-#ifdef __PLANCK__
 
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/pmclib/parabox.h"
-#include "HL2_likely/tools/mvdens.h"
-#include "HL2_likely/pmclib/allmc.h"
-#include "HL2_likely/pmclib/distribution.h"
-#else
-
-#include "errorlist.h"
 #include "parabox.h"
-#include "mvdens.h"
+
+#include "pmctools/errorlist.h"
+#include "pmctools/mvdens.h"
 #include "allmc.h"
 #include "distribution.h"
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>

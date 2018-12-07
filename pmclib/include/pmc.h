@@ -10,33 +10,13 @@
 #ifndef __PMC_H
 #define __PMC_H
 
-#ifdef __PLANCK__
-
-#include <math.h>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_vector.h>
-
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/pmclib/parabox.h"
-#include "HL2_likely/tools/mvdens.h"
-#include "HL2_likely/pmclib/tools.h"
-#include "HL2_likely/pmclib/allmc.h"
-#include "HL2_likely/pmclib/distribution.h"
-
-#else
-
-#include "errorlist.h"
+#include "pmctools/errorlist.h"
+#include "pmctools/mvdens.h"
 #include "parabox.h"
-#include "mvdens.h"
 #include "tools.h"
 #include "distribution.h"
 #include "allmc.h"
 
-#endif
-
-//#define __PMC_DBG_
 #define _PRSTP_ 20. 
 
 /* errors */
@@ -149,7 +129,7 @@ void pmc_simu_init_proposal(pmc_simu* psim,
 void pmc_simu_init_pmc(pmc_simu* psim, 
                        void* filter_data,
                        filter_func* pmc_filter,
-                       update_func* pmc_update,error **err);
+                       update_func* pmc_update);
 size_t pmc_simu_importance(pmc_simu *psim, gsl_rng *r,error **err);
 double pmc_simu_pmc_step(pmc_simu *psim, gsl_rng *r,error **err);
 void pmc_simu_init_classic_importance(pmc_simu* psim,distribution* target, parabox *pb,
@@ -187,7 +167,9 @@ size_t generic_get_importance_weight_and_deduced(pmc_simu *psim, void *m,
 size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *proposal_data,
 						      posterior_log_pdf_func *proposal_log_pdf,
 						      posterior_log_pdf_func *posterior_log_pdf,
-						      retrieve_ded_func *retrieve_ded, void *target_data, int quiet, error **err);
+						      retrieve_ded_func *retrieve_ded, void *target_data, double t_iter_tempered,
+						      int quiet, error **err);
+
 
 void filter_importance_weight(pmc_simu *psim,double nsig,error **err);
 

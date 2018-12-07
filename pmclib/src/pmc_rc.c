@@ -98,7 +98,7 @@ void * rcinit_combine_distributions(confFile* rc,char* root, error **err) {
   
   comb = combine_distribution_init(ndim,nded,err);
   forwardError(*err,__LINE__,NULL);
-  
+
   hn = _rc_dist_set_names(rca, comb,err);
   forwardError(*err,__LINE__,NULL);
   
@@ -474,7 +474,7 @@ mix_mvdens* rc_mix_mvdens(confFile* rc, error **err) {
   forwardError(*err,__LINE__,NULL);
   
   if (flg==1) {
-#ifdef _WITH_HDF5_
+#ifdef HAS_HDF5
     char *hdfname;
     
     hdfname = rc_get_string(rc,"fromfile",err);
@@ -585,7 +585,7 @@ mix_mvdens* rc_mix_mvdens(confFile* rc, error **err) {
     FILE *f;
     file = rc_get_string(rc,"save",err);
     forwardError(*err,__LINE__,NULL);    
-#ifdef _WITH_HDF5_
+#ifdef HAS_HDF5
     mix_mvdens_hdfdump(mmv,file,err);
     forwardError(*err,__LINE__,NULL);    
 #else
@@ -715,8 +715,7 @@ pmc_simu* init_pmc_from_rc(confFile *rc,char *root,error **err) {
   psim = init_importance_from_rc(rc,root,err);
   forwardError(*err,__LINE__,NULL);
   
-  pmc_simu_init_pmc(psim, NULL, NULL, update_prop_rb_void, err);
-  forwardError(*err,__LINE__,NULL);
+  pmc_simu_init_pmc(psim, NULL, NULL, update_prop_rb_void);
   
   return psim;  
 }
@@ -794,7 +793,7 @@ char* get_itername(confFile* rc,char *key, int iter,error **err) {
   return oes;
 }
 
-#ifdef _WITH_HDF5_
+#ifdef HAS_HDF5
 #include "hdf5.h"
 
 void generic_hdfinit(char* fname,char *grpname, int ndim, int nded, int nsample, double *pars, double *deds, double *loglkl,hid_t *pfile_id, hid_t *pgroup_id,error **err) {

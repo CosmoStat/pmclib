@@ -137,7 +137,7 @@ void pmc_simu_init_proposal(pmc_simu* psim,
 void pmc_simu_init_pmc(pmc_simu* psim, 
                               void* filter_data,
                               filter_func* pmc_filter,
-                              update_func* pmc_update, error **err) {
+                              update_func* pmc_update) {
   
   psim->filter_data = filter_data;
   psim->pmc_filter  = pmc_filter;
@@ -169,8 +169,7 @@ void pmc_simu_init_classic_pmc(pmc_simu* psim,
                                    prop_data,prop_print_step,err);
   forwardError(*err,__LINE__,);
 
-  pmc_simu_init_pmc(psim, filter_data, pmc_filter, update_prop_rb_void, err);
-  forwardError(*err,__LINE__,);
+  pmc_simu_init_pmc(psim, filter_data, pmc_filter, update_prop_rb_void);
 }
 
 size_t pmc_simu_importance(pmc_simu *psim, gsl_rng *r,error **err) {
@@ -277,10 +276,16 @@ long simulate_mix_mvdens(struct _pmc_simu_struct_ *psim, mix_mvdens *proposal, g
     forwardError(*err,__LINE__,0);
     ok=1;
     if (pb!=NULL) {
+
+      // MKDEBUG //fprintf(stderr, "MKDEBUG: Testing "); print_parameter(stderr, psim->ndim, psim->X+i*psim->ndim);
+
       if (isinBox(pb,psim->X+i*psim->ndim,err)==0) 
         ok=0;
       forwardError(*err,__LINE__,0);
     }
+
+    // MKDEBUG //fprintf(stderr, "ok = %d\n", ok);
+
     if (ok) {	
       psim->indices[i] = ind;
       psim->flg[i] = 1;
@@ -288,9 +293,9 @@ long simulate_mix_mvdens(struct _pmc_simu_struct_ *psim, mix_mvdens *proposal, g
     } else {
       inok++;
       testErrorRetVA(inok>MNOK*psim->nsamples, pmc_tooManySteps,
-                     "Too many points (%d) outside of box. Try to (1) decrease the variance of the initial\n"
+                     "Too many points (%d) outside of box (inside: %d). Try to (1) decrease the variance of the initial\n"
                      "proposal (e.g. check the Fisher matrix); (2) increase nsamples",
-                     *err, __LINE__, 0, inok);
+                     *err, __LINE__, 0, inok, i);
     }
   }
   return i;
@@ -472,7 +477,7 @@ size_t generic_get_importance_weight_and_deduced(pmc_simu *psim, void *proposal_
    size_t res;
 
    res = generic_get_importance_weight_and_deduced_verb(psim, proposal_data, proposal_log_pdf, posterior_log_pdf,
-							retrieve_ded, target_data, 0, err);
+							retrieve_ded, target_data, -1, 0, err);
    forwardError(*err, __LINE__, 0.0);
    return res;
 }
@@ -483,7 +488,8 @@ size_t generic_get_importance_weight_and_deduced(pmc_simu *psim, void *proposal_
 size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *proposal_data,
 						      posterior_log_pdf_func *proposal_log_pdf,
 						      posterior_log_pdf_func *posterior_log_pdf,
-						      retrieve_ded_func *retrieve_ded, void *target_data, int quiet, error **err)
+						      retrieve_ded_func *retrieve_ded, void *target_data, 
+						      double t_iter_tempered, int quiet, error **err)
 {
   double *x;
   size_t i;
@@ -501,6 +507,14 @@ size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *prop
   double MW,MR;
   double rloc, post;
   char preamble[200];
+
+  /* MKDEBUG: To be removed */
+  testErrorRetVA(t_iter_tempered<0, pmc_infinite, "t_iter_tempered=%g should be > 0", *err, __LINE__, -1, t_iter_tempered);
+  if (t_iter_tempered < 0) {
+    t_iter_tempered = 1;  /* No tempering */
+  }
+
+  printf("MKDEBUG t_iter_tempered = %g\n", t_iter_tempered);
   
   local_weights     = psim->weights;
   local_X           = psim->X;
@@ -558,7 +572,8 @@ size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *prop
                 "Invalid (%g) return value for target density", *err, __LINE__, rloc);
     //ParameterError(*err,x,ndim);    
 
-    rloc = post - rloc;
+    // MKDEBUG: New, tempering exponent, posterior^t_iter_tempered
+    rloc = t_iter_tempered * post - rloc;
 
     if (retrieve_ded!=NULL && n_ded>0) {
        retrieve_ded(target_data, &(local_X_ded[i*n_ded]), err);
@@ -656,7 +671,8 @@ double normalize_importance_weight(pmc_simu *psim,error **err) {
       wtmp = weights[i];
       weights[i] = exp(wtmp-weight_max+DYNMAX);
       if (!finite(weights[i])) {
-	fprintf(stderr, "Got infinite weight w=%g (log w=%g) at %ld, flagging it out\n", weights[i], wtmp, i);
+	 fprintf(stderr, "Got infinite weight w=%g (log w=%g, max=%g) at %ld, flagging it out\n",
+		 weights[i], wtmp, weight_max, i);
         flg[i] = 0;
         continue;
       }
@@ -1098,18 +1114,16 @@ double evidence(pmc_simu *psim, double *ln_evi,error **err) {
 double mean_from_psim(double *X, double *w, short *flg, int nsamples, int ndim, int a)
 {
   double m;
-  int i, n;
+  int i;
   
   /* TODO(?): check isLog */
-  for (i=0,n=0,m=0.0; i<nsamples; i++) {
+  for (i=0,m=0.0; i<nsamples; i++) {
     if (flg[i]==0) continue;
     m += w[i]*X[i*ndim+a];
-    n++;
   }
   
   return m;
 }
-
 
 int double_cmp(const void *av, const void *bv)
 {

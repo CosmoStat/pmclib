@@ -1,12 +1,7 @@
 /* Parameter boxes */
 
-#ifdef __PLANCK__
-#include "HL2_likely/tools/errorlist.h"
-#include "HL2_likely/tools/io.h"
-#else
-#include "errorlist.h"
-#include "io.h"
-#endif
+#include "pmctools/errorlist.h"
+#include "pmctools/io.h"
 
 #ifndef __PARABOX__
 #define __PARABOX__

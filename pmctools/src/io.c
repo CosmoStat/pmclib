@@ -19,7 +19,7 @@ unsigned int numberoflines(const char *name, error **err)
    F = fopen_err(name, "r", err);   forwardError(*err, __LINE__, 0);
 
    do {
-      c = fgetc(F);
+      c = (char)fgetc(F);
       if (c=='\n') n++;
    } while (c!=EOF);
 
@@ -38,7 +38,7 @@ unsigned int numberoflines_comments(const char *name, unsigned int *ncomment, er
    *ncomment = 0;
    cpre = '\n';
    do {
-      c = fgetc(F);
+      c = (char)fgetc(F);
       if (c=='#' && cpre=='\n') {
 	 n--;
 	 (*ncomment)++;
@@ -64,7 +64,7 @@ int read_double(char** p, double *x)
 int read_int(char** p, int *x)
 {
    char *endptr;
-   *x = strtod(*p,&endptr);
+   *x = (int)strtod(*p,&endptr);
    return ((&endptr != p) && (*p=endptr));
 }
 
@@ -78,14 +78,17 @@ double *readASCII(char *filename, int *fnx, int *fny, sm2_error **err) {
   F = fopen_err(filename, "r",err);
   forwardError(*err,__LINE__,NULL);
   
-  fscanf(F, "%d %d\n", fnx, fny);
+  n = fscanf(F, "%d %d\n", fnx, fny);
+  testErrorRetVA(n!=2, io_file, "%d elements read from file %s, expected %d",
+		 *err, __LINE__, NULL, filename, n, 2);
   mat = malloc_err((*fnx)*(*fny)*sizeof(double), err);
   forwardError(*err, __LINE__, NULL);
 
   for(j=0;j<*fny;j++) {
     for(i=0;i<*fnx;i++) {
       n = fscanf(F, "%le\n", &val);
-      testErrorRetVA(n!=1, io_file, "Error while reading file %s", *err, __LINE__, NULL,filename);
+      testErrorRetVA(n!=1, io_file, "%d elements read from file %s, expected %d",
+		     *err, __LINE__, NULL, n, filename, 1);
       mat[i+j*(*fnx)] = val;  /* hopefully the right order ... */
     }
   }
@@ -109,7 +112,7 @@ void* malloc_err(size_t sz, error **err)
 {
   void* res;
   
-  testErrorRetVA(sz<=0,err_allocate,"Cannot allocate %ld bytes",*err,__LINE__,NULL,sz);
+  testErrorRetVA(sz<=0,err_allocate,"Size %ld has to be positive",*err,__LINE__,NULL,sz);
   
   res = malloc(sz);
   testErrorRetVA(res==NULL,err_allocate,"Cannot allocate %ld bytes",*err,__LINE__,NULL,sz);
@@ -119,7 +122,7 @@ void* malloc_err(size_t sz, error **err)
 void* calloc_err(size_t nl, size_t sz1, error **err)
 {
   void* res;
-  testErrorRetVA(nl<=0,err_allocate,"Cannot allocate %ld bytes",*err,__LINE__,NULL,nl);
+  testErrorRetVA(nl<=0,err_allocate,"Size %ld has to be positive",*err,__LINE__,NULL,nl);
   
   res = calloc(nl,sz1);
   testErrorRetVA(res==NULL,err_allocate,"Cannot allocate %d objects of %d bytes (=%d total)",
@@ -129,8 +132,12 @@ void* calloc_err(size_t nl, size_t sz1, error **err)
 
 void *realloc_err(void *ptr, size_t sz, error **err)
 {
-   realloc(ptr, sz);
+   void *res;
+
+   res = realloc(ptr, sz);
    testErrorVA(ptr==NULL, err_allocate, "Cannot reallocate %zu bytes", *err, __LINE__, NULL, sz);
+   testErrorVA(res==NULL, err_allocate, "Cannot reallocate %zu bytes", *err, __LINE__, NULL, sz);
+
    return NULL;
 }
 
@@ -172,7 +179,7 @@ size_t read_line(FILE* fp, char* buff, int bmax, error **err) {
   i=0;
   dsc=0;
   while (i<bmax-1) {
-    cur=fgetc(fp);
+     cur=(char)fgetc(fp);
     if (feof(fp) || cur=='\n') {
       buff[i]='\0';
       //fprintf(stderr,"Read |%s|\n",buff);
@@ -445,5 +452,51 @@ void end_time(time_t t_start, FILE *FOUT)
    fprintf(FOUT, "Computation time %.0fs (= %dd %dh %dm %ds)\n",
            diff, (int)diff/86400, ((int)diff%86400)/3600,
            ((int)diff%3600)/60, ((int)diff%60));
+}
+
+clock_t start_clock(FILE *FOUT)
+{
+   clock_t c_start;
+   time_t t_start;
+
+   time(&t_start);
+   c_start = clock();
+   fprintf(FOUT, "Started at %s\n", ctime(&t_start));
+   fflush(FOUT);
+   return c_start;
+}
+
+void end_clock(clock_t c_start, FILE *FOUT)
+{
+   clock_t c_end;
+   time_t t_end;
+   float diff;
+   int idiff;
+
+   c_end = clock();
+   time(&t_end);
+   fprintf(FOUT, "Ended at %s", ctime(&t_end));
+
+   diff  = (float)c_end - (float)c_start;
+   diff /= 1000000.0; /* in seconds */
+   idiff = (int)diff;
+ 
+   fprintf(FOUT, "Computation time %.3fs (= %dd %dh %dm %ds %dms)\n",
+           diff, idiff/86400, (idiff%86400)/3600,
+           (idiff%3600)/60, idiff%60, (int)(1000*diff)-1000*idiff);
+}
+
+/* Returns 1 if path is a directory, and 0 otherwise */
+int is_directory(const char *path)
+{
+   struct stat s;
+   int err;
+
+   err = stat(path, &s);
+   if (err != -1 && S_ISDIR(s.st_mode)) {
+      return 1;
+   } else {
+      return 0;
+   }
 }
 

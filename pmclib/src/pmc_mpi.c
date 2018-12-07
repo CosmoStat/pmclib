@@ -60,7 +60,7 @@ size_t pmc_simu_importance_mpi(pmc_simu *psim, gsl_rng *r,error **err) {
     master_samples=psim->nsamples;
     psim->nsamples=mysamples;
     
-  } else {//slave
+  } else {//client
     
     //only receives simu
     receive_simulation(psim,psim->mpi_size,psim->mpi_rank,err);
@@ -80,15 +80,14 @@ size_t pmc_simu_importance_mpi(pmc_simu *psim, gsl_rng *r,error **err) {
   
   /**** cleanup ***************************************************************/  
   if (psim->mpi_rank==0) { //master
-    //receive computation from slaves
+    //receive computation from clients
     mysamples=psim->nsamples;
     psim->nsamples=master_samples;      
     nok=receive_importance_weight(psim,psim->mpi_size,nok,mysamples,err);
     forwardError(*err,__LINE__,0);
   } else {
     //send results    
-    send_importance_weight(psim->mpi_rank,psim->mpi_size,psim,nok,err);
-    forwardError(*err,__LINE__,0);
+    send_importance_weight(psim->mpi_rank,psim->mpi_size,psim,nok);
   }
   
   return nok;
@@ -150,8 +149,7 @@ void pmc_simu_init_classic_pmc_mpi(pmc_simu* psim,
 				       prop_data,prop_print_step,err);
   forwardError(*err,__LINE__,);
   
-  pmc_simu_init_pmc(psim, filter_data, pmc_filter, &update_prop_rb_void, err);
-  forwardError(*err,__LINE__,);
+  pmc_simu_init_pmc(psim, filter_data, pmc_filter, &update_prop_rb_void);
 }
 
 void* mvdens_broadcast_mpi(void* data,error **err) {
@@ -234,7 +232,7 @@ distribution *mix_mvdens_distribution_mpi(int ndim,void *mxmv, error **err) {
   return dist;
 }
 
-#ifdef _WITH_RC_
+#ifdef HAS_LUA
 
 mix_mvdens* rc_mix_mvdens_mpi(confFile* rc, error **err) {
   int mpi_rank,mpi_size;
@@ -326,8 +324,7 @@ pmc_simu* init_pmc_mpi_from_rc(confFile *rc,char *root,error **err) {
   psim = init_importance_mpi_from_rc(rc,root,err);
   forwardError(*err,__LINE__,NULL);
   
-  pmc_simu_init_pmc(psim, NULL, NULL, update_prop_rb_void, err);
-  forwardError(*err,__LINE__,NULL);
+  pmc_simu_init_pmc(psim, NULL, NULL, update_prop_rb_void);
   
   return psim;  
 }
@@ -338,7 +335,7 @@ pmc_simu* init_pmc_mpi_from_rc(confFile *rc,char *root,error **err) {
 /******************** exchanging pmc data *************************************/
 /******************************************************************************/
 
-/* Master sends to slaves */
+/* Master sends to clients */
 size_t send_simulation(pmc_simu* psim, int nproc, error **err) {
   size_t nsamples_per_proc,nsamples_master,current_sample,buffsize,remaining;
   int tag,i;
@@ -353,7 +350,7 @@ size_t send_simulation(pmc_simu* psim, int nproc, error **err) {
     buffsize=nsamples_per_proc+1;
     remaining--;
   }
-  fprintfDEBUG(stderr,"Master %ld Slaves %ld\n",nsamples_master,nsamples_per_proc);
+  fprintfDEBUG(stderr,"Master %ld Clients %ld\n",nsamples_master,nsamples_per_proc);
   for (i=1;i<nproc;i++) {
     fprintfDEBUG(stderr,"I am the master, I am sending buffsize to %d on %d (%zu)\n",i,tag*mc_tag_simulation_size+i,buffsize);
     MPI_Send(&buffsize,1,MPI_LONG,i,tag*mc_tag_simulation_size+i,MPI_COMM_WORLD);
@@ -379,7 +376,7 @@ size_t send_simulation(pmc_simu* psim, int nproc, error **err) {
   return nsamples_master;
 }
 
-/* Slaves receive from master */
+/* Clients receive from master */
 void receive_simulation(pmc_simu* psim, int basetag,int myid, error **err)
 {
   size_t buffsize;
@@ -408,8 +405,8 @@ void receive_simulation(pmc_simu* psim, int basetag,int myid, error **err)
   return;
 }
 
-/* Slaves send to master */
-void send_importance_weight(int myid, int basetag, pmc_simu *psim, size_t nok, error **err)
+/* Clients send to master */
+void send_importance_weight(int myid, int basetag, pmc_simu *psim, size_t nok)
 {
   // Send unnormalized local weights to master
   size_t buffsize;
@@ -446,7 +443,7 @@ void send_importance_weight(int myid, int basetag, pmc_simu *psim, size_t nok, e
   return;
 }
 
-/* Master receives from slaves */
+/* Master receives from clients */
 size_t receive_importance_weight(pmc_simu *psim,int nproc,int master_cnt,int master_sample,error **err)
 {
   size_t current_sample;
@@ -520,7 +517,7 @@ size_t receive_importance_weight(pmc_simu *psim,int nproc,int master_cnt,int mas
 /******************** exchanging mvdens proposal ******************************/
 /******************************************************************************/
 
-// This routine is called by master to send update MOG to slaves
+// This routine is called by master to send update MOG to clients
 void send_mix_mvdens(mix_mvdens *m, int nproc,error **err) {
   int tag,i;
   size_t buffsz;
@@ -539,7 +536,7 @@ void send_mix_mvdens(mix_mvdens *m, int nproc,error **err) {
   }
 }
 
-/* Slaves receive from master */
+/* Clients receive from master */
 mix_mvdens * receive_mix_mvdens(int myid, int nproc,error **err) {
   int tag;
   size_t buffsz;
