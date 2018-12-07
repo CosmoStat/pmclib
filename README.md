@@ -26,7 +26,7 @@ First, configure the software:
 
 ```bash
 cd pmclib
-./waf configure [--destdir=PATH]
+./waf configure
 ```
 
 You might need to set paths to required libraries and other options. `waf` can install libraries for you. Note that some libraries are not essential for the use of `pmclib` (but optional e.g. `lapack`, `lua`).
