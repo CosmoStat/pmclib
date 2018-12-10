@@ -13,8 +13,8 @@
 #include <mpi.h>
 
 #include "pmc.h"
-#include "pmctools/mvdens.h"
-#include "pmctools/errorlist.h"
+#include "mvdens.h"
+#include "errorlist.h"
 
 /* Set DEBUG_MPI to 1 for debug outputs concerning communication between master and clients */
 #define DEBUG_MPI 0
