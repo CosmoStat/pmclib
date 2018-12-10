@@ -7,11 +7,7 @@
  *
  */
 
-#ifdef __PLANCK__
-#include "HL2_likely/pmclib/tools.h"
-#else
 #include "tools.h"
-#endif
 
 
 

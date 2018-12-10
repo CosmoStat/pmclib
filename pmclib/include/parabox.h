@@ -1,7 +1,7 @@
 /* Parameter boxes */
 
-#include "pmctools/errorlist.h"
-#include "pmctools/io.h"
+#include "errorlist.h"
+#include "io.h"
 
 #ifndef __PARABOX__
 #define __PARABOX__

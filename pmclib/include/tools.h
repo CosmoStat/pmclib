@@ -11,9 +11,9 @@
 #ifndef __TOOLS_H
 #define __TOOLS_H
 
-#include "pmctools/errorlist.h"
-#include "pmctools/io.h"
-#include "pmctools/maths_base.h"
+#include "errorlist.h"
+#include "io.h"
+#include "maths_base.h"
 #include "mcmc.h"
 
 #include <stdlib.h>

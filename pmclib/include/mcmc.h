@@ -12,8 +12,8 @@
 
 #include "parabox.h"
 
-#include "pmctools/errorlist.h"
-#include "pmctools/mvdens.h"
+#include "errorlist.h"
+#include "mvdens.h"
 #include "allmc.h"
 #include "distribution.h"
 

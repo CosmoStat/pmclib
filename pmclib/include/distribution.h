@@ -12,9 +12,9 @@
 #define __MC_DIST
 #include <gsl/gsl_randist.h>
 
-#include "pmctools/errorlist.h"
-#include "pmctools/mvdens.h"
-#include "pmctools/maths.h"
+#include "errorlist.h"
+#include "mvdens.h"
+#include "maths.h"
 
 #include "parabox.h"
 #include "allmc.h"

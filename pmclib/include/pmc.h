@@ -10,8 +10,8 @@
 #ifndef __PMC_H
 #define __PMC_H
 
-#include "pmctools/errorlist.h"
-#include "pmctools/mvdens.h"
+#include "errorlist.h"
+#include "mvdens.h"
 #include "parabox.h"
 #include "tools.h"
 #include "distribution.h"

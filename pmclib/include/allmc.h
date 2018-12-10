@@ -12,7 +12,7 @@
 
 #include <gsl/gsl_randist.h>
 
-#include "pmctools/errorlist.h"
+#include "errorlist.h"
 #include "parabox.h"
 
 struct _pmc_simu_struct_;

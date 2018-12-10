@@ -19,8 +19,8 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
 
-#include "pmctools/errorlist.h"
-#include "pmctools/io.h"
+#include "errorlist.h"
+#include "io.h"
 
 
 #define math_base                -300
