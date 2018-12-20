@@ -29,6 +29,8 @@ cd pmclib
 ./waf configure --prefix=PATH
 ```
 
+Note that `waf` is a python2 script.
+
 You might need to set paths to required libraries and other options. `waf` can install libraries for you. Note that some libraries are not essential for the use of `pmclib` (but optional e.g. `lapack`, `lua`).
 
 Next, compile the code:
