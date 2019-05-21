@@ -277,14 +277,10 @@ long simulate_mix_mvdens(struct _pmc_simu_struct_ *psim, mix_mvdens *proposal, g
     ok=1;
     if (pb!=NULL) {
 
-      // MKDEBUG //fprintf(stderr, "MKDEBUG: Testing "); print_parameter(stderr, psim->ndim, psim->X+i*psim->ndim);
-
       if (isinBox(pb,psim->X+i*psim->ndim,err)==0) 
         ok=0;
       forwardError(*err,__LINE__,0);
     }
-
-    // MKDEBUG //fprintf(stderr, "ok = %d\n", ok);
 
     if (ok) {	
       psim->indices[i] = ind;
@@ -525,7 +521,7 @@ size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *prop
   n_ded             = psim->n_ded;
   
   if (psim->prop_print_step>0)
-    print_step        = 100.0/psim->prop_print_step/nsamples_per_proc;
+    print_step = 100.0/psim->prop_print_step/nsamples_per_proc;
   else
     print_step = 1000;
 
