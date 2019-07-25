@@ -510,8 +510,6 @@ size_t generic_get_importance_weight_and_deduced_verb(pmc_simu *psim, void *prop
     t_iter_tempered = 1;  /* No tempering */
   }
 
-  printf("MKDEBUG t_iter_tempered = %g\n", t_iter_tempered);
-  
   local_weights     = psim->weights;
   local_X           = psim->X;
   local_X_ded       = psim->X_ded;
