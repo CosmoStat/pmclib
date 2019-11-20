@@ -1,15 +1,15 @@
-
+from __future__ import print_function
 
 def build(bld):
   def injectpath(task):
     src = task.inputs[0].srcpath(task.env)
-    print src 
+    print(src)
     tgt = task.outputs[0].bldpath(task.env) 
     f=open(src)
     txt = f.read()
     txt = txt%{"path":bld.env.install_examples+"/libsampleTarget."+bld.env.shsuffix}
     f=open(tgt,"w")
-    print >>f,txt,
+    print(txt, file=f)
     f.close()
 
   if not bld.env.dolua:
