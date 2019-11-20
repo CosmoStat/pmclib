@@ -127,7 +127,7 @@ def configure(conf):
     add_lib(conf,gsl_prefix,gsl_include,gsl_lib,"gsl",
           ["gsl_ran_gaussian","gsl_blas_dgemm","gsl_linalg_cholesky_invert"],["gsl/gsl_randist.h","gsl/gsl_blas.h","gsl/gsl_linalg.h"],
           libs=libs)
-  except Exception,e:
+  except Exception as e:
     pprint("RED","gsl not found")
     pprint("PINK", "check that gsl_prefix or gsl_lib and gsl_include command line options point toward your gsl install")
     pprint("PINK", "or check that gsl is compiled in %d bit (as you have specified for pmclib)"%{True:64}.get(Options.options.m64,32))
@@ -206,8 +206,8 @@ def configure(conf):
 
     add_lib(conf,fftw3_prefix,fftw3_include,fftw3_lib,"fftw3","fftw_execute","fftw3.h", libs=libs,defines="_WITH_FFTW3_")
     conf.env.fftw3 = True
-  except Exception,e:
-    print e
+  except Exception as e:
+    print(e)
     conf.env.fftw3 = False
     pprint("PINK", "fftw3 not found, will skip building things requiring fftw3")
     pprint("PINK", "check that fftw3_prefix or fftw3_lib and fftw3_include command line options point toward your fftw3 install")
@@ -243,7 +243,7 @@ def configure(conf):
     add_lib(conf,lapack_prefix,lapack_include,lapack_lib,"lapack","dpotrf",includes, libs=libs,defines=["_WITH_LAPACK_"]+extradefs)
     conf.env.lapack = True
     
-  except Exception,e:
+  except Exception as e:
     conf.env.lapack = False
     pprint("PINK", "lapack not found, will skip building things requiring lapack")
     pprint("PINK", "check that lapack_prefix or lapack_lib and lapack_include command line options point toward your lapack install")
@@ -268,10 +268,10 @@ def configure(conf):
     conf.set_env_name('mpibld', envmpibld) 
     conf.setenv('default')
   
-  print "configure ok\n\nrun './waf build install' now !"
+  print("configure ok\n\nnow run './waf build install'")
 
 def build(bld):
-  print "build"
+  print("build")
   bld.add_subdirs("pmctools")
   bld.add_subdirs("pmclib")  
   bld.add_subdirs("pmcexec")  
