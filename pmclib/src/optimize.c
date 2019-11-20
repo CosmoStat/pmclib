@@ -615,7 +615,7 @@ double secant_linesearch(linesearch_struct *lst, distribution *dist, double *PIM
     
     if ( candic && ((xn+delta-xplus)/(xplus-xmoins)>= 0 || (xn+delta-xmoins)/(xplus-xmoins)<= 0) ) {
       double xp;
-      _DEBUGHERE_("DICHOTOMIZE !","");
+      //_DEBUGHERE_("DICHOTOMIZE !","");
       xp = xn;
       yn = dicho_along(dist, lst->PIM, pk, gk, 0, &xn, &xmoins, &xplus, err);
       forwardError(*err,__LINE__,-1);
@@ -759,7 +759,7 @@ void bydir_free(void **pbd) {
   free(bd->PIM);
   free(bd->pk);
   free(bd->scale);
-  free_linesearch(&(bd->ls));
+  free_linesearch((void**)(&(bd->ls)));
   free(bd);
   *pbd = NULL;
 }
