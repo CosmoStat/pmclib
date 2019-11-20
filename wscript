@@ -26,8 +26,9 @@ def add_lib(conf,prefix,include,libpath,libname, funcname="",headername="",libs 
     funcname=[funcname]
   if type(defines)==type(""):
     defines=[defines]
+
     
-  conf.check_cc(lib=libs, libpath = libpath_prefix,rpath=libpath_prefix ,uselib_store=libname,mandatory=1,uselib=uselib,defines=defines)
+  conf.check_cc(lib=libs, libpath = libpath_prefix, rpath=libpath_prefix ,uselib_store=libname,mandatory=1,uselib=uselib,defines=defines)
   for fnc in funcname:
     conf.check_cc(
       errmsg="failed (check whether lib is compiled in 32 or 64bits)",
@@ -35,8 +36,8 @@ def add_lib(conf,prefix,include,libpath,libname, funcname="",headername="",libs 
       
 def add_lib_option(libname,opt,default="/usr/local/lib"):
   opt.add_option("--%s_islocal"%libname,action="store_true",default=False,help="%s has been installed with install%s"%(libname,libname))
-  opt.add_option("--%s_prefix"%libname,action="store",default=False,help="%s include/lib path prefix"%libname)
-  #opt.add_option("--%s_prefix"%libname,action="store",default=default,help="%s include/lib path prefix"%libname)
+  opt.add_option("--%s_prefix"%libname,action="store",default=default,help="%s include/lib path prefix"%libname)
+  #opt.add_option("--%s_prefix"%libname,action="store",default="./",help="%s include/lib path prefix"%libname)
   opt.add_option("--%s_include"%libname,action="store",default="",help="%s include path"%libname)
   opt.add_option("--%s_lib"%libname,action="store",default="",help="%s lib path"%libname)
   opt.add_option("--%s_link"%libname,action="store",default="",help="%s link line"%libname)
@@ -45,7 +46,9 @@ def libsfromlinkline(ll):
   return [lb.strip() for lb in ll.split("-l") if lb.strip()]
   
 def set_options(opt):
-  add_lib_option("gsl",opt)
+  #add_lib_option("gsl",opt,default="/media/mkilbing/DATA/miniconda3/envs/cosmopmc")
+  add_lib_option("gsl",opt,default="MK_TO_REPLACE")
+  #add_lib_option("gsl",opt)
   add_lib_option("lua",opt)
   add_lib_option("hdf5",opt)
   add_lib_option("fftw3",opt)
@@ -133,8 +136,8 @@ def configure(conf):
     pprint("PINK", "check that gsl_prefix or gsl_lib and gsl_include command line options point toward your gsl install")
     pprint("PINK", "or check that gsl is compiled in %d bit (as you have specified for pmclib)"%{True:64}.get(Options.options.m64,32))
     pprint("PINK","alternatively, I can also install gsl for you, type './waf installgsl'")
-    #raise e
-    pprint("ORANGE", "continuing for now...")
+    #pprint("ORANGE", "continuing for now...")
+    raise e
   
   # dl
   conf.check_cc(lib="dl",mandatory=0,defines=["HAS_RTLD_DEFAULT"],fragment="#include <dlfcn.h> \nint main() {void* tt = RTLD_DEFAULT;}",msg="checking for RTLD_DEFAULT in dl",uselib_store="dl")
